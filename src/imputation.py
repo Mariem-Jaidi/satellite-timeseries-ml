@@ -96,29 +96,40 @@ def run_imputation(master_df):
     # Step 1 — deduplicate
     df = deduplicate_dates(master_df)
 
-    # Step 2 — track which rows were originally missing before we touch anything
-    originally_missing = df['NDVI'].isna()
-    df['was_originally_missing'] = originally_missing
-
-    # Step 3 — apply decision rule to all rows (only matters for missing ones)
+    # Step 2 — track which rows were originally missing
+    originally_missing_mask = df['NDVI'].isna()
+    df['was_originally_missing'] = originally_missing_mask
     df['decision'] = df['Nuages_%'].apply(decide_action)
 
-    # Step 4 — linear interpolation per source_file
-    df = df.groupby('source_file', group_keys=True).apply(
+    # Step 3 — linear interpolation per source_file
+    # we interpolate FIRST, then selectively undo for FLAG/DELETE
+    df_interp = df.groupby('source_file', group_keys=True).apply(
         interpolate_file, include_groups=False
     )
-    df = df.reset_index(level=0)
-    df = df.reset_index(drop=True)
+    df_interp = df_interp.reset_index(level=0)
+    df_interp = df_interp.reset_index(drop=True)
 
-    # Step 5 — undo interpolation for FLAG rows (set back to NaN)
-    flag_mask = (df['was_originally_missing']) & (df['decision'] == 'FLAG')
-    df.loc[flag_mask, INDEX_COLS] = np.nan
+    # Step 4 — restore was_originally_missing and decision onto interpolated df
+    # groupby/apply can drop or misalign non-grouped columns, so we re-attach them
+    # using source_file + Date as the join key (guaranteed unique after dedup)
+    key_cols = df[['source_file', 'Date', 'was_originally_missing', 'decision']].copy()
+    df_interp['Date'] = pd.to_datetime(df_interp['Date'])
+    key_cols['Date'] = pd.to_datetime(key_cols['Date'])
+
+    df_interp = df_interp.drop(
+        columns=['was_originally_missing', 'decision'], errors='ignore'
+    )
+    df_interp = df_interp.merge(key_cols, on=['source_file', 'Date'], how='left')
+
+    # Step 5 — undo interpolation for FLAG rows only
+    flag_mask = (df_interp['was_originally_missing']) & (df_interp['decision'] == 'FLAG')
+    df_interp.loc[flag_mask, INDEX_COLS] = np.nan
 
     # Step 6 — remove DELETE rows
-    delete_mask = (df['was_originally_missing']) & (df['decision'] == 'DELETE')
-    df = df.drop(index=df[delete_mask].index).reset_index(drop=True)
+    delete_mask = (df_interp['was_originally_missing']) & (df_interp['decision'] == 'DELETE')
+    df_interp = df_interp.drop(index=df_interp[delete_mask].index).reset_index(drop=True)
 
     # Step 7 — build audit log
-    audit_df = build_audit_log(df, df['was_originally_missing'])
+    audit_df = build_audit_log(df_interp, df_interp['was_originally_missing'])
 
-    return df, audit_df
+    return df_interp, audit_df

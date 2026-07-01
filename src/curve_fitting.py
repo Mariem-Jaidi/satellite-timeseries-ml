@@ -13,6 +13,8 @@ def curve_fit_file(group, window=SG_WINDOW, poly=SG_POLYORDER):
     Applies Savitzky-Golay smoothing to all INDEX_COLS
     within one plot's timeline (one source_file group).
     Automatically shrinks window for short series.
+    NaNs (FLAG rows) are temporarily filled before smoothing
+    so savgol_filter receives a complete series.
     """
     group = group.sort_values('Date').reset_index(drop=True)
     n_points = len(group)
@@ -24,8 +26,14 @@ def curve_fit_file(group, window=SG_WINDOW, poly=SG_POLYORDER):
 
     smoothed = group.copy()
     for col in INDEX_COLS:
+        series = group[col].copy()
+
+        # temporarily fill NaNs so savgol_filter gets a complete array
+        # limit_direction='both' handles edge NaNs (start/end of series) too
+        series_filled = series.interpolate(method='linear', limit_direction='both')
+
         smoothed[col] = savgol_filter(
-            group[col],
+            series_filled,
             window_length=actual_window,
             polyorder=poly
         )

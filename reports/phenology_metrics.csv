@@ -1,5 +1,5 @@
 source_file,variety,SOS,POS,EOS,LOS,AUC,phenology_note
-indices_nuages_carioka.csv,carioka,2024-11-08,2025-03-15,,,,incomplete — SOS or EOS not found within data range
+indices_nuages_carioka.csv,carioka,2024-11-08,2025-04-04,,,,incomplete — SOS or EOS not found within data range
 indices_nuages_dhahbi2.csv,dhahbi,2025-01-07,2025-04-04,2025-05-17,130.0,,ok
 indices_nuages_dhahbi3.csv,dhahbi,2024-12-13,2025-04-04,2025-06-01,170.0,,ok
 indices_nuages_dhahbi4.csv,dhahbi,2024-12-13,2025-04-04,2025-06-03,172.0,,ok
@@ -26,5 +26,5 @@ indices_nuages_maali5.csv,maali,2024-12-13,2025-04-04,2025-06-11,180.0,,ok
 indices_nuages_salim.csv,salim,2025-01-07,2025-03-18,2025-05-17,130.0,90.16798325419175,ok
 indices_nuages_salim1.csv,salim,2025-01-07,2025-03-18,2025-05-27,140.0,92.2356399531822,ok
 indices_nuages_salim2.csv,salim,2024-12-18,2025-02-16,2025-05-27,160.0,,ok
-indices_nuages_salim3.csv,salim,2024-11-23,2025-03-15,2025-06-11,200.0,,ok
+indices_nuages_salim3.csv,salim,2024-11-23,2025-04-04,2025-06-11,200.0,,ok
 indices_nuages_saragola.csv,saragola,2024-12-18,2025-04-04,2025-05-27,160.0,,ok
