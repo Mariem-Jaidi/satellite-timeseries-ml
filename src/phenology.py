@@ -5,7 +5,6 @@
 
 import pandas as pd
 import numpy as np
-from sqlalchemy import values
 from config import (
     PHENOLOGY_AMPLITUDE_THRESHOLD,
     PHENOLOGY_MIN_POINTS,
