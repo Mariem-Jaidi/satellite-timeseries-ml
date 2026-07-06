@@ -24,3 +24,6 @@ Thumbs.db
 
 # Data — raw data not committed (too large / proprietary)
 data/raw/
+# HF Spaces — binary files not needed for app
+data/processed/external_requests/
+reports/missing_data_analysis.png
