@@ -1,3 +1,13 @@
+---
+title: Wheat Phenology Pipeline
+emoji: 🌾
+colorFrom: green
+colorTo: blue
+sdk: streamlit
+sdk_version: "1.58.0"
+app_file: streamlit_app.py
+pinned: false
+---
 # INRAT Béja Wheat Phenology Pipeline
 
 An end-to-end automated ML pipeline for cleaning satellite-derived vegetation 
